@@ -69,7 +69,6 @@ class Game:
         pygame.display.set_caption("Sprite Adventure")
         self.clock = pygame.time.Clock()
 
-        # --- PERUBAHAN DISINI: Memuat Background ---
         try:
             bg_raw = pygame.image.load('background.png').convert()
             self.bg_image = pygame.transform.scale(bg_raw, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -109,7 +108,6 @@ class Game:
         if self.score == len(self.coins): self.state = "WON"
 
     def draw_screen(self):
-        # --- PERUBAHAN DISINI: Render Background ---
         if self.bg_image:
             self.screen.blit(self.bg_image, (0, 0))
         else:
