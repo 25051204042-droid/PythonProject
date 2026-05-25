@@ -12,12 +12,14 @@ class Game:
 
         pygame.display.set_caption('Game Silat Hokya')
         self.screen = pygame.display.set_mode((640, 480))
+        # Membuat kanvas internal berukuran lebih kecil
         self.display = pygame.Surface((320, 240))
 
         self.clock = pygame.time.Clock()
 
         self.movement = [False, False]
-
+        #enkapsulasi
+        #memuat seluruh gambar dan objek animasi game
         self.assets = {
             'decor': load_images('tiles/decor'),
             'grass': load_images('tiles/grass'),
@@ -32,7 +34,7 @@ class Game:
             'player/slide': Animation(load_images('entities/player/slide')),
             'player/wall_slide': Animation(load_images('entities/player/wall_slide')),
         }
-
+        #Menyatukan objek Player, Tilemap, dan Clouds.
         self.clouds = Clouds(self.assets['clouds'], count=16)
 
         self.player = Player(self, (50, 50), (8, 15))
@@ -45,7 +47,7 @@ class Game:
     def run(self):
         while True:
             self.display.blit(self.assets['background'], (0, 0))
-
+            #Menghitung pergerakan layar dan mengikuti Player
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
@@ -57,7 +59,7 @@ class Game:
 
             self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
             self.player.render(self.display, offset=render_scroll)
-
+            #Membaca input keyboard dan tombol keluar game
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
