@@ -1,3 +1,6 @@
+#File ini menggabungkan alat dari utils(mengambil gambar) dan sistem dari tilemap(kanvas kosong)
+#menjadi sebuah aplikasi visual yang bisa tinggal klik-klik
+
 import sys
 
 import pygame
@@ -9,6 +12,7 @@ RENDER_SCALE = 2.0
 
 
 class Editor:
+    #constructor
     def __init__(self):
         pygame.init()
 
@@ -130,9 +134,9 @@ class Editor:
                     if event.key == pygame.K_g:
                         self.ongrid = not self.ongrid
                     if event.key == pygame.K_t:
-                        self.tilemap.autotile()
+                        self.tilemap.autotile() #otomatis mengubah bentuk pinggirannya agar menyatu rapi
                     if event.key == pygame.K_o:
-                        self.tilemap.save('map.json')
+                        self.tilemap.save('map.json') #menyimpan map
                     if event.key == pygame.K_LSHIFT:
                         self.shift = True
                 if event.type == pygame.KEYUP:

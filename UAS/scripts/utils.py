@@ -1,8 +1,12 @@
+#utils.py : menyediakan alat-alat bantu agar file lain bisa bekerja dengan mudah.
+
 import os
 import pygame
 
 BASE_IMG_PATH = 'data/images/'
 
+#load_image & load_images:
+#Tugasnya mengambil gambar balok, trs hpus latar belakang supaya siap dipakai di dalam game.
 def load_image(path):
     img = pygame.image.load(BASE_IMG_PATH + path).convert()
     img.set_colorkey((0, 0, 0))
@@ -14,11 +18,13 @@ def load_images(path):
         images.append(load_image(path + '/' + img_name))
     return images
 
+#Tugasnya mengatur pergantian gambar dari frame ke frame
 class Animation:
+    #construktor
     def __init__(self, images, img_dur=5, loop=True):
-        self.images = images
+        self.images = images #enkapsulasi
         self.loop = loop
-        self.img_duration = img_dur
+        self.img_duration = img_dur #enkapsulasi
         self.done = False
         self.frame = 0
 
