@@ -1,3 +1,5 @@
+#Sebagai pusat kendali yang mengatur jendela, membaca input tombol, dan menjalankan loop untuk
+#memperbarui serta menggambar seluruh objek game (Player, Tilemap, Clouds) secara bersamaan.
 import sys
 import pygame
 
