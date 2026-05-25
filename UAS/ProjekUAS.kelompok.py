@@ -10,7 +10,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption('WIIIIIIIIII')
+        pygame.display.set_caption('Game Silat Hokya')
         self.screen = pygame.display.set_mode((640, 480))
         self.display = pygame.Surface((320, 240))
 
