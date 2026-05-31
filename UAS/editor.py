@@ -1,5 +1,5 @@
 #File ini menggabungkan alat dari utils(mengambil gambar) dan sistem dari tilemap(kanvas kosong)
-#menjadi sebuah aplikasi visual yang bisa tinggal klik-klik
+#menjadi sebuah aplikasi visual yang bisa tinggal klik-klik gitu loh
 
 import sys
 
