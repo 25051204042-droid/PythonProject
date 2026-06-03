@@ -1,5 +1,3 @@
-#tilemap.py : mencatat dan mengatur posisi setiap balok di dalam dunia game.
-
 import json
 
 import pygame
@@ -22,7 +20,6 @@ AUTOTILE_TYPES = {'grass', 'stone'}
 
 
 class Tilemap:
-    #constructor
     def __init__(self, game, tile_size=16):
         self.game = game
         self.tile_size = tile_size
@@ -58,8 +55,6 @@ class Tilemap:
                 tiles.append(self.tilemap[check_loc])
         return tiles
 
-    #save & load:
-    #tugasnya mencatat seluruh susunan map ke dalam file file map.json dan membacanya kembali saat game dibuka lagi.
     def save(self, path):
         f = open(path, 'w')
         json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
@@ -70,7 +65,6 @@ class Tilemap:
         map_data = json.load(f)
         f.close()
 
-        #enkapsulasi
         self.tilemap = map_data['tilemap']
         self.tile_size = map_data['tile_size']
         self.offgrid_tiles = map_data['offgrid']
@@ -81,8 +75,6 @@ class Tilemap:
             if self.tilemap[tile_loc]['type'] in PHYSICS_TILES:
                 return self.tilemap[tile_loc]
 
-    #phycisc rects around:
-    #mendeteksi mana balok yang padat supaya karakter game tidak tembus ke dalam tanah atau bisa berdiri di atasnya
     def physics_rects_around(self, pos):
         rects = []
         for tile in self.tiles_around(pos):
@@ -92,8 +84,6 @@ class Tilemap:
                                 self.tile_size))
         return rects
 
-    #autotile:
-    #otomatis mengubah bentuk pinggirannya agar menyatu rapi, tidak perlu memilih variasi bentuk balok satu per satu.
     def autotile(self):
         for loc in self.tilemap:
             tile = self.tilemap[loc]
