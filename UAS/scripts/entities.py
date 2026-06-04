@@ -195,9 +195,17 @@ class Player(PhysicsEntity):
                 self.game.particles.append(
                     Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0, 7)))
         if self.dashing > 0:
-            self.dashing = max(0, self.dashing - 1)
+            if self.dashing > 50:
+                self.dashing = max(0, self.dashing - 1)
+            else:
+                self.dashing = max(0, self.dashing - 3)
+
         if self.dashing < 0:
-            self.dashing = min(0, self.dashing + 1)
+            if self.dashing < -50:
+                self.dashing = min(0, self.dashing + 1)
+            else:
+                self.dashing = min(0, self.dashing + 3)
+
         if abs(self.dashing) > 50:
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
             if abs(self.dashing) == 51:
