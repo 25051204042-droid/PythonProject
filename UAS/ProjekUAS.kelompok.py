@@ -26,7 +26,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.movement = [False, False]
-        #enkapsulasi
+
         self.assets = {
             'decor': load_images('tiles/decor'),
             'grass': load_images('tiles/grass'),
@@ -48,7 +48,7 @@ class Game:
             'projectile': load_image('projectile.png'),
         }
 
-        #mengenkapsulasi efek suara
+        #efek suara
         self.sfx = {
             'jump': pygame.mixer.Sound('data/sfx/jump.wav'),
             'dash': pygame.mixer.Sound('data/sfx/dash.wav'),
@@ -152,7 +152,6 @@ class Game:
                     self.particles.append(
                         Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
-            #polimorfisme
             self.clouds.update()
             self.clouds.render(self.display_2, offset=render_scroll)
 
