@@ -4,7 +4,7 @@ import math
 import random
 
 import pygame
-#ais nakalll
+
 from scripts.utils import load_image, load_images, Animation
 from scripts.entities import PhysicsEntity, Player, Enemy
 from scripts.tilemap import Tilemap
@@ -14,6 +14,7 @@ from scripts.spark import Spark
 
 
 class Game:
+    #konstruktor
     def __init__(self):
         pygame.init()
 
@@ -25,7 +26,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.movement = [False, False]
-
+        #enkapsulasi
         self.assets = {
             'decor': load_images('tiles/decor'),
             'grass': load_images('tiles/grass'),
@@ -47,6 +48,7 @@ class Game:
             'projectile': load_image('projectile.png'),
         }
 
+        #mengenkapsulasi efek suara
         self.sfx = {
             'jump': pygame.mixer.Sound('data/sfx/jump.wav'),
             'dash': pygame.mixer.Sound('data/sfx/dash.wav'),
@@ -55,16 +57,16 @@ class Game:
             'ambience': pygame.mixer.Sound('data/sfx/ambience.wav'),
         }
 
+        #setel volume suara
         self.sfx['ambience'].set_volume(0.2)
         self.sfx['shoot'].set_volume(0.4)
         self.sfx['hit'].set_volume(0.8)
         self.sfx['dash'].set_volume(0.3)
         self.sfx['jump'].set_volume(0.7)
 
+        #kelas Game memuat objek dari kelas Clouds, Player, dan Tilemap.
         self.clouds = Clouds(self.assets['clouds'], count=16)
-
         self.player = Player(self, (50, 50), (8, 15))
-
         self.tilemap = Tilemap(self, tile_size=16)
 
         self.level = 0
@@ -72,13 +74,16 @@ class Game:
 
         self.screenshake = 0
 
+    #berfungsi untuk mereset kondisi level saat ini dan membaca data peta baru.
     def load_level(self, map_id):
         self.tilemap.load('data/maps/' + str(map_id) + '.json')
 
+        #mencari koordinat dekorasi pohon pada peta untuk dijadikan titik spawning daun gugur
         self.leaf_spawners = []
         for tree in self.tilemap.extract([('large_decor', 2)], keep=True):
             self.leaf_spawners.append(pygame.Rect(4 + tree['pos'][0], 4 + tree['pos'][1], 23, 13))
 
+        #membuat objek musuh (enemy) baru secara berulang di dalam memori berdasarkan data peta.
         self.enemies = []
         for spawner in self.tilemap.extract([('spawners', 0), ('spawners', 1)]):
             if spawner['variant'] == 0:
@@ -95,6 +100,7 @@ class Game:
         self.dead = 0
         self.transition = -30
 
+    #inti dari seluruh eksekusi game yang berjalan terus-menerus
     def run(self):
         pygame.mixer.music.load('data/music.wav')
         pygame.mixer.music.set_volume(0.5)
@@ -108,6 +114,7 @@ class Game:
 
             self.screenshake = max(0, self.screenshake - 1)
 
+            #progress level
             if not len(self.enemies):
                 self.transition += 1
                 if self.transition > 30:
@@ -116,6 +123,7 @@ class Game:
             if self.transition < 0:
                 self.transition += 1
 
+            #respawn pemain
             if self.dead:
                 self.dead += 1
                 if self.dead >= 10:
@@ -123,16 +131,19 @@ class Game:
                 if self.dead > 40:
                     self.load_level(self.level)
 
+            #kamera smooth
             self.scroll[0] += (self.player.rect().centerx - self.display.get_width() / 2 - self.scroll[0]) / 30
             self.scroll[1] += (self.player.rect().centery - self.display.get_height() / 2 - self.scroll[1]) / 30
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
+            #partikel daun
             for rect in self.leaf_spawners:
                 if random.random() * 49999 < rect.width * rect.height:
                     pos = (rect.x + random.random() * rect.width, rect.y + random.random() * rect.height)
                     self.particles.append(
                         Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
+            #polimorfisme
             self.clouds.update()
             self.clouds.render(self.display_2, offset=render_scroll)
 
@@ -148,7 +159,7 @@ class Game:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                 self.player.render(self.display, offset=render_scroll)
 
-            # [[x, y], direction, timer]
+            #ledakan
             for projectile in self.projectiles.copy():
                 projectile[0][0] += projectile[1]
                 projectile[2] += 1
@@ -184,6 +195,7 @@ class Game:
                 if kill:
                     self.sparks.remove(spark)
 
+            #garis tepi otomatis
             display_mask = pygame.mask.from_surface(self.display)
             display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor=(0, 0, 0, 0))
             for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -197,6 +209,7 @@ class Game:
                 if kill:
                     self.particles.remove(particle)
 
+            #event input
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -217,6 +230,7 @@ class Game:
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
 
+            #transisi lingkaran kontraksi
             if self.transition:
                 transition_surf = pygame.Surface(self.display.get_size())
                 pygame.draw.circle(transition_surf, (255, 255, 255),
@@ -227,6 +241,7 @@ class Game:
 
             self.display_2.blit(self.display, (0, 0))
 
+            #guncangan layar
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2,
                                   random.random() * self.screenshake - self.screenshake / 2)
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)
