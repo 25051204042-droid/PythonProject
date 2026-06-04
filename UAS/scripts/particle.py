@@ -1,4 +1,5 @@
 class Particle:
+    #konstruktor
     def __init__(self, game, p_type, pos, velocity=[0, 0], frame=0):
         self.game = game
         self.type = p_type
@@ -7,6 +8,7 @@ class Particle:
         self.animation = self.game.assets['particle/' + p_type].copy()
         self.animation.frame = frame
 
+    #method yang memanggil di setiap frame game untuk memperbarui posisi dan status animasi partikel.
     def update(self):
         kill = False
         if self.animation.done:
@@ -19,6 +21,7 @@ class Particle:
 
         return kill
 
+    #method untuk menggambar partikel ke layar.
     def render(self, surf, offset=(0, 0)):
         img = self.animation.img()
         surf.blit(img,
