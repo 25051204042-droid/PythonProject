@@ -2,7 +2,7 @@ import os
 import sys
 import math
 import random
-#isya syelo
+
 import pygame
 
 from scripts.utils import load_image, load_images, Animation
@@ -107,7 +107,7 @@ class Game:
 
     #inti dari seluruh eksekusi game yang berjalan terus-menerus
     def run(self):
-        pygame.mixer.music.load('data/horek.mp3')
+        pygame.mixer.music.load('data/music.wav')
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
 
