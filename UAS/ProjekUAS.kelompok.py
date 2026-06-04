@@ -2,7 +2,7 @@ import os
 import sys
 import math
 import random
-
+#isya syelo
 import pygame
 
 from scripts.utils import load_image, load_images, Animation
