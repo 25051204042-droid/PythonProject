@@ -1,3 +1,5 @@
+#alat (tool) bagi developer untuk mendesain map/level secara visual,
+#lalu menyimpannya ke dalam file JSON (map.json) agar nanti bisa dimuat di dalam game utama.
 import sys
 
 import pygame
@@ -5,10 +7,12 @@ import pygame
 from scripts.utils import load_images
 from scripts.tilemap import Tilemap
 
+#Pengaturan Resolusi Layar
 RENDER_SCALE = 2.0
 
 
 class Editor:
+    #konstruktor
     def __init__(self):
         pygame.init()
 
@@ -18,6 +22,7 @@ class Editor:
 
         self.clock = pygame.time.Clock()
 
+        #memuat gambar tile ke memori
         self.assets = {
             'decor': load_images('tiles/decor'),
             'grass': load_images('tiles/grass'),
@@ -50,6 +55,7 @@ class Editor:
         while True:
             self.display.fill((0, 0, 0))
 
+            #kamera bergeser berdasarkan tombol WASD yang ditekan oleh pengguna
             self.scroll[0] += (self.movement[1] - self.movement[0]) * 2
             self.scroll[1] += (self.movement[3] - self.movement[2]) * 2
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
@@ -74,9 +80,11 @@ class Editor:
                 self.tilemap.tilemap[str(tile_pos[0]) + ';' + str(tile_pos[1])] = {
                     'type': self.tile_list[self.tile_group], 'variant': self.tile_variant, 'pos': tile_pos}
             if self.right_clicking:
+                #MENGHAPUS TILE ON-GRID
                 tile_loc = str(tile_pos[0]) + ';' + str(tile_pos[1])
                 if tile_loc in self.tilemap.tilemap:
                     del self.tilemap.tilemap[tile_loc]
+                #MENGHAPUS TILE OFF-GRID
                 for tile in self.tilemap.offgrid_tiles.copy():
                     tile_img = self.assets[tile['type']][tile['variant']]
                     tile_r = pygame.Rect(tile['pos'][0] - self.scroll[0], tile['pos'][1] - self.scroll[1],
@@ -84,6 +92,7 @@ class Editor:
                     if tile_r.collidepoint(mpos):
                         self.tilemap.offgrid_tiles.remove(tile)
 
+            #tampilan tile yg sedang digunakan
             self.display.blit(current_tile_img, (5, 5))
 
             for event in pygame.event.get():
@@ -100,17 +109,21 @@ class Editor:
                                  'pos': (mpos[0] + self.scroll[0], mpos[1] + self.scroll[1])})
                     if event.button == 3:
                         self.right_clicking = True
-                    if self.shift:
+                    if self.shift: #SHIFT : mengubah variasi ubin
+                        #shift + scroll ke atas
                         if event.button == 4:
                             self.tile_variant = (self.tile_variant - 1) % len(
                                 self.assets[self.tile_list[self.tile_group]])
+                        #shift + scroll ke bawah
                         if event.button == 5:
                             self.tile_variant = (self.tile_variant + 1) % len(
                                 self.assets[self.tile_list[self.tile_group]])
-                    else:
+                    else: #TANPA SHIFT : mengubah kategori ubin
+                        #scroll ke atas tanpa shift
                         if event.button == 4:
                             self.tile_group = (self.tile_group - 1) % len(self.tile_list)
                             self.tile_variant = 0
+                        #scroll ke bawah tanpa shift
                         if event.button == 5:
                             self.tile_group = (self.tile_group + 1) % len(self.tile_list)
                             self.tile_variant = 0
@@ -120,6 +133,8 @@ class Editor:
                     if event.button == 3:
                         self.right_clicking = False
 
+
+                #menggerakkan kamera editor (Scoll atas, kiri, bawah, kanan)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_a:
                         self.movement[0] = True
@@ -129,14 +144,22 @@ class Editor:
                         self.movement[2] = True
                     if event.key == pygame.K_s:
                         self.movement[3] = True
+                    #mengaktifkan/mematikan mode Grid (ongrid)
                     if event.key == pygame.K_g:
                         self.ongrid = not self.ongrid
+                    #memanggil fungsi autotile()
+                    #untuk otomatis merapikan tepian rumput atau tanah agar menyatu
                     if event.key == pygame.K_t:
                         self.tilemap.autotile()
+                    #menyimpan hasil kerja map ke dalam file data
                     if event.key == pygame.K_o:
                         self.tilemap.save('map.json')
+                    #Shift + Scroll Mouse
+                    #mengganti variasi bentuk di dalam kategori yang sama
                     if event.key == pygame.K_LSHIFT:
                         self.shift = True
+
+                #Menghentikan Pergerakan Kamera dengan melepas tombol keyboard
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_a:
                         self.movement[0] = False

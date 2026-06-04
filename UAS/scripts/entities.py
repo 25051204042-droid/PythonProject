@@ -8,6 +8,7 @@ from scripts.spark import Spark
 
 
 class PhysicsEntity:
+    #konstruktor
     def __init__(self, game, e_type, pos, size):
         self.game = game
         self.type = e_type
@@ -23,68 +24,76 @@ class PhysicsEntity:
 
         self.last_movement = [0, 0]
 
+    #method untuk membuat kotak tabrakan
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])
 
+    #mengatur perubahan animasi tubuh karakter
     def set_action(self, action):
         if action != self.action:
             self.action = action
             self.animation = self.game.assets[self.type + '/' + self.action].copy()
 
+    #tabrakan dinding dan fisika
     def update(self, tilemap, movement=(0, 0)):
         self.collisions = {'up': False, 'down': False, 'right': False, 'left': False}
 
         frame_movement = (movement[0] + self.velocity[0], movement[1] + self.velocity[1])
 
+        #pergerakan dan tabrakan sumbu x
         self.pos[0] += frame_movement[0]
         entity_rect = self.rect()
+        #mengecek tile padat
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
-                if frame_movement[0] > 0:
+                if frame_movement[0] > 0: #bergerak ke kanan
                     entity_rect.right = rect.left
                     self.collisions['right'] = True
-                if frame_movement[0] < 0:
+                if frame_movement[0] < 0: #bergerak ke kiri
                     entity_rect.left = rect.right
                     self.collisions['left'] = True
                 self.pos[0] = entity_rect.x
 
+        #pergerakan dan tabrakan sumbu y
         self.pos[1] += frame_movement[1]
         entity_rect = self.rect()
         for rect in tilemap.physics_rects_around(self.pos):
             if entity_rect.colliderect(rect):
-                if frame_movement[1] > 0:
+                if frame_movement[1] > 0: #jatuh ke bawah
                     entity_rect.bottom = rect.top
                     self.collisions['down'] = True
-                if frame_movement[1] < 0:
+                if frame_movement[1] < 0: #melompat ke atas
                     entity_rect.top = rect.bottom
                     self.collisions['up'] = True
                 self.pos[1] = entity_rect.y
 
         if movement[0] > 0:
-            self.flip = False
+            self.flip = False #menghadap ke kanan
         if movement[0] < 0:
-            self.flip = True
+            self.flip = True #menghadap ke kiri
 
         self.last_movement = movement
 
-        self.velocity[1] = min(5, self.velocity[1] + 0.1)
+        self.velocity[1] = min(5, self.velocity[1] + 0.1) #gravitasi
 
         if self.collisions['down'] or self.collisions['up']:
             self.velocity[1] = 0
 
         self.animation.update()
 
+    #menggambar karakter ke layar monitor
     def render(self, surf, offset=(0, 0)):
         surf.blit(pygame.transform.flip(self.animation.img(), self.flip, False),
                   (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
 
 class Enemy(PhysicsEntity):
+    #konstruktor
     def __init__(self, game, pos, size):
         super().__init__(game, 'enemy', pos, size)
 
         self.walking = 0
-
+    #methid untuk engatur musuh, sistem patroli, mendeteksi jurang, menembak, dan mendeteksi kematian.
     def update(self, tilemap, movement=(0, 0)):
         if self.walking:
             if tilemap.solid_check((self.rect().centerx + (-7 if self.flip else 7), self.pos[1] + 23)):
@@ -136,6 +145,7 @@ class Enemy(PhysicsEntity):
                 self.game.sparks.append(Spark(self.rect().center, math.pi, 5 + random.random()))
                 return True
 
+    #method untuk menggambar tubuh musuh sekaligus senjata senapannya ke layar
     def render(self, surf, offset=(0, 0)):
         super().render(surf, offset=offset)
 
@@ -148,6 +158,7 @@ class Enemy(PhysicsEntity):
 
 
 class Player(PhysicsEntity):
+    #konstruktor
     def __init__(self, game, pos, size):
         super().__init__(game, 'player', pos, size)
         self.air_time = 0
@@ -155,6 +166,7 @@ class Player(PhysicsEntity):
         self.wall_slide = False
         self.dashing = 0
 
+    #method untuk engontrol semua logika pergerakan kompleks, penentuan animasi, dan penanganan status dash pemain.
     def update(self, tilemap, movement=(0, 0)):
         super().update(tilemap, movement=movement)
 
@@ -219,10 +231,12 @@ class Player(PhysicsEntity):
         else:
             self.velocity[0] = min(self.velocity[0] + 0.1, 0)
 
+    #methid untuk menggambar karakter pemain ke layar monitor.
     def render(self, surf, offset=(0, 0)):
         if abs(self.dashing) <= 50:
             super().render(surf, offset=offset)
 
+    #methid aksi lompat biasa dan lompat dari dinding
     def jump(self):
         if self.wall_slide:
             if self.flip and self.last_movement[0] < 0:
@@ -244,6 +258,7 @@ class Player(PhysicsEntity):
             self.air_time = 5
             return True
 
+    #kemampuan melesat cepat (dash) secara horizontal.
     def dash(self):
         if not self.dashing:
             self.game.sfx['dash'].play()
