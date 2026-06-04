@@ -1,24 +1,26 @@
 import os
-
 import pygame
 
 BASE_IMG_PATH = 'data/images/'
 
 
+#Fungsi pembantu untuk memuat gambar
+#Membaca 1 buah gambar
 def load_image(path):
     img = pygame.image.load(BASE_IMG_PATH + path).convert()
     img.set_colorkey((0, 0, 0))
     return img
 
-
+#Membaca banyak gambar sekaligus dalam satu folder
 def load_images(path):
     images = []
     for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
         images.append(load_image(path + '/' + img_name))
     return images
 
-
+#mengatur kondisi animasi
 class Animation:
+    # konstruktor
     def __init__(self, images, img_dur=5, loop=True):
         self.images = images
         self.loop = loop
@@ -26,9 +28,11 @@ class Animation:
         self.done = False
         self.frame = 0
 
+    #Membuat duplikat atau salinan dari animasi ini
     def copy(self):
         return Animation(self.images, self.img_duration, self.loop)
 
+    #Menjalankan stopwatch frame animasi di setiap detik game
     def update(self):
         if self.loop:
             self.frame = (self.frame + 1) % (self.img_duration * len(self.images))
@@ -37,5 +41,6 @@ class Animation:
             if self.frame >= self.img_duration * len(self.images) - 1:
                 self.done = True
 
+    #Mengembalikan gambar mana yang HARUS digambar di layar saat ini
     def img(self):
         return self.images[int(self.frame / self.img_duration)]

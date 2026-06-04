@@ -20,6 +20,7 @@ AUTOTILE_TYPES = {'grass', 'stone'}
 
 
 class Tilemap:
+    # konstruktor
     def __init__(self, game, tile_size=16):
         self.game = game
         self.tile_size = tile_size
