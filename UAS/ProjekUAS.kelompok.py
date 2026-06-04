@@ -2,7 +2,7 @@ import os
 import sys
 import math
 import random
-
+#isya syelo
 import pygame
 
 from scripts.utils import load_image, load_images, Animation
@@ -18,7 +18,7 @@ class Game:
     def __init__(self):
         pygame.init()
 
-        pygame.display.set_caption('Gunshin: The Iron Ninja')
+        pygame.display.set_caption('Pencak Silat : Hokya')
         self.screen = pygame.display.set_mode((640, 480))
         self.display = pygame.Surface((320, 240), pygame.SRCALPHA)
         self.display_2 = pygame.Surface((320, 240))
@@ -74,6 +74,11 @@ class Game:
 
         self.screenshake = 0
 
+        pygame.font.init()
+        #status apakah game sudah tamat
+        self.font = pygame.font.SysFont('arialblack', 32, bold=True)
+        self.game_won = False
+
     #berfungsi untuk mereset kondisi level saat ini dan membaca data peta baru.
     def load_level(self, map_id):
         self.tilemap.load('data/maps/' + str(map_id) + '.json')
@@ -102,7 +107,7 @@ class Game:
 
     #inti dari seluruh eksekusi game yang berjalan terus-menerus
     def run(self):
-        pygame.mixer.music.load('data/music.wav')
+        pygame.mixer.music.load('data/horek.mp3')
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(-1)
 
@@ -118,8 +123,12 @@ class Game:
             if not len(self.enemies):
                 self.transition += 1
                 if self.transition > 30:
-                    self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
-                    self.load_level(self.level)
+                    if self.level == 2:
+                        self.game_won = True  #layar sudah tertutup hitam penuh, aktifkan menang
+                        self.transition = 30  #kunci nilai transisi agar layar tetap hitam
+                    else:
+                        self.level = min(self.level + 1, len(os.listdir('data/maps')) - 1)
+                        self.load_level(self.level)
             if self.transition < 0:
                 self.transition += 1
 
@@ -245,6 +254,16 @@ class Game:
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2,
                                   random.random() * self.screenshake - self.screenshake / 2)
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)
+
+            if self.game_won:
+                #timpa seluruh layar dengan warna hitam kosong
+                self.screen.fill((0, 0, 0))
+
+                #render teks MENANG berwarna hijau
+                text_surf = self.font.render('MENANG', True, (0, 255, 0))
+                text_rect = text_surf.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+                self.screen.blit(text_surf, text_rect)
+
             pygame.display.update()
             self.clock.tick(60)
 
