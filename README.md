@@ -36,7 +36,8 @@ Begitu kotak fisik karaktermu menabrak kotak portal tersebut, program game akan 
 
 Penerapan Pilar Utama PBO
 1. Class dan Object (Kelas dan Objek)
-Class adalah cetak biru (blueprint) atau kerangka kerja, sedangkan Object adalah wujud nyata yang dibuat berdasarkan blueprint tersebut. 
+Class adalah cetak biru (blueprint) atau kerangka kerja, sedangkan Object adalah wujud nyata yang dibuat berdasarkan blueprint tersebut.
+
 a. Class
 class Game:
 class Editor:
