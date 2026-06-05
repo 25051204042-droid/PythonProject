@@ -119,7 +119,7 @@ class Game:
 
             self.screenshake = max(0, self.screenshake - 1)
 
-            #progress level
+            #Cek Level & Tamat
             if not len(self.enemies):
                 self.transition += 1
                 if self.transition > 30:
@@ -152,11 +152,13 @@ class Game:
                     self.particles.append(
                         Particle(self, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
 
+            #abstraksi
             self.clouds.update()
             self.clouds.render(self.display_2, offset=render_scroll)
 
             self.tilemap.render(self.display, offset=render_scroll)
 
+            #pusat kendali untuk menggerakkan dan menggambar aktor-aktor utama di game kamu, yaitu Enemy dan Ninja.
             for enemy in self.enemies.copy():
                 kill = enemy.update(self.tilemap, (0, 0))
                 enemy.render(self.display, offset=render_scroll)
@@ -167,7 +169,7 @@ class Game:
                 self.player.update(self.tilemap, (self.movement[1] - self.movement[0], 0))
                 self.player.render(self.display, offset=render_scroll)
 
-            #ledakan
+            #pusat kendali untuk mengatur peluru yang ditembakkan oleh musuh .
             for projectile in self.projectiles.copy():
                 projectile[0][0] += projectile[1]
                 projectile[2] += 1
@@ -197,13 +199,14 @@ class Game:
                                                                      math.sin(angle + math.pi) * speed * 0.5],
                                                            frame=random.randint(0, 7)))
 
+            #pusat kendali untuk menggerakkan dan menggambar partikel percikan api
             for spark in self.sparks.copy():
                 kill = spark.update()
                 spark.render(self.display, offset=render_scroll)
                 if kill:
                     self.sparks.remove(spark)
 
-            #garis tepi otomatis
+            #efek garis tepi objek
             display_mask = pygame.mask.from_surface(self.display)
             display_sillhouette = display_mask.to_surface(setcolor=(0, 0, 0, 180), unsetcolor=(0, 0, 0, 0))
             for offset in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -217,7 +220,7 @@ class Game:
                 if kill:
                     self.particles.remove(particle)
 
-            #event input
+            #penerjemah perintah tombol
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -238,7 +241,7 @@ class Game:
                     if event.key == pygame.K_RIGHT:
                         self.movement[1] = False
 
-            #transisi lingkaran kontraksi
+            #pembuat efek transisi visual berbentuk lingkaran hitam
             if self.transition:
                 transition_surf = pygame.Surface(self.display.get_size())
                 pygame.draw.circle(transition_surf, (255, 255, 255),
@@ -249,7 +252,7 @@ class Game:
 
             self.display_2.blit(self.display, (0, 0))
 
-            #guncangan layar
+            #efek layar bergetar
             screenshake_offset = (random.random() * self.screenshake - self.screenshake / 2,
                                   random.random() * self.screenshake - self.screenshake / 2)
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), screenshake_offset)

@@ -15,6 +15,7 @@ AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (-1, 0), (0, 1), (0, -1)])): 8,
 }
 
+#untuk mendeteksi ubin tetangga
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 PHYSICS_TILES = {'grass', 'stone'}
 AUTOTILE_TYPES = {'grass', 'stone'}
@@ -68,7 +69,7 @@ class Tilemap:
         json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
         f.close()
 
-    #Membaca berkas json cetak biru peta untuk dirakit menjadi dunia game
+    #Membaca berkas json kertas denah peta untuk dirakit menjadi dunia game
     def load(self, path):
         f = open(path, 'r')
         map_data = json.load(f)
@@ -95,7 +96,7 @@ class Tilemap:
                                 self.tile_size))
         return rects
 
-    #untuk merapikan tekstur pinggiran tanah secara otomatis
+    #untuk merapikan tekstur pinggiran tanah secara
     def autotile(self):
         for loc in self.tilemap:
             tile = self.tilemap[loc]
@@ -109,7 +110,7 @@ class Tilemap:
             if (tile['type'] in AUTOTILE_TYPES) and (neighbors in AUTOTILE_MAP):
                 tile['variant'] = AUTOTILE_MAP[neighbors]
 
-    #pembatasan layar
+    #menggambar visual dunia game ke monitor
     def render(self, surf, offset=(0, 0)):
         for tile in self.offgrid_tiles:
             surf.blit(self.game.assets[tile['type']][tile['variant']],
