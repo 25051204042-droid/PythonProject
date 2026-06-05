@@ -4,8 +4,8 @@ import sys
 
 import pygame
 
-from scripts.utils import load_images
-from scripts.tilemap import Tilemap
+from scripts.utils import load_images #memindai sebuah folder, mengambil semua gambar di dalamnya, dan memuatnya ke dalam memori game secara otomatis.
+from scripts.tilemap import Tilemap #arsitek utama dari seluruh sistem peta dunia game ini
 
 #Pengaturan Resolusi Layar
 RENDER_SCALE = 2.0
@@ -65,11 +65,12 @@ class Editor:
             current_tile_img = self.assets[self.tile_list[self.tile_group]][self.tile_variant].copy()
             current_tile_img.set_alpha(100)
 
+            #konversi koordinat dari kursor mouse di layar monitor asli menjadi koordinat indeks petak (grid)
             mpos = pygame.mouse.get_pos()
             mpos = (mpos[0] / RENDER_SCALE, mpos[1] / RENDER_SCALE)
             tile_pos = (int((mpos[0] + self.scroll[0]) // self.tilemap.tile_size),
                         int((mpos[1] + self.scroll[1]) // self.tilemap.tile_size))
-
+            #menampilkan gambar pratinjau ubin
             if self.ongrid:
                 self.display.blit(current_tile_img, (tile_pos[0] * self.tilemap.tile_size - self.scroll[0],
                                                      tile_pos[1] * self.tilemap.tile_size - self.scroll[1]))
@@ -109,6 +110,7 @@ class Editor:
                                  'pos': (mpos[0] + self.scroll[0], mpos[1] + self.scroll[1])})
                     if event.button == 3:
                         self.right_clicking = True
+
                     if self.shift: #SHIFT : mengubah variasi ubin
                         #shift + scroll ke atas
                         if event.button == 4:

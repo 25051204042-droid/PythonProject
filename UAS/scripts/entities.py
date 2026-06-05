@@ -3,8 +3,8 @@ import random
 
 import pygame
 
-from scripts.particle import Particle
-from scripts.spark import Spark
+from scripts.particle import Particle #jejak dash player, dan serpihan musuh saat hancur
+from scripts.spark import Spark #musuh menembak, dan musuh hancur
 
 
 class PhysicsEntity:
@@ -105,7 +105,9 @@ class Enemy(PhysicsEntity):
                 self.flip = not self.flip
             self.walking = max(0, self.walking - 1)
             if not self.walking:
+                #enemy mendeteksi player untuk menghitung jarak dan menentukan kapan harus menembak.
                 dis = (self.game.player.pos[0] - self.pos[0], self.game.player.pos[1] - self.pos[1])
+                #musuh mendeteksi dirinya tertabrak kotak Player
                 if (abs(dis[1]) < 16):
                     if (self.flip and dis[0] < 0):
                         self.game.sfx['shoot'].play()
@@ -129,6 +131,7 @@ class Enemy(PhysicsEntity):
         else:
             self.set_action('idle')
 
+        #musuh membaca status pemain untuk memproses mekanik combat (terluka/mati).
         if abs(self.game.player.dashing) >= 50:
             if self.rect().colliderect(self.game.player.rect()):
                 self.game.screenshake = max(16, self.game.screenshake)
@@ -199,6 +202,7 @@ class Player(PhysicsEntity):
             else:
                 self.set_action('idle')
 
+        #efek ledakan partikel di awal dan akhir dash
         if abs(self.dashing) in {60, 50}:
             for i in range(20):
                 angle = random.random() * math.pi * 2
@@ -206,18 +210,23 @@ class Player(PhysicsEntity):
                 pvelocity = [math.cos(angle) * speed, math.sin(angle) * speed]
                 self.game.particles.append(
                     Particle(self.game, 'particle', self.rect().center, velocity=pvelocity, frame=random.randint(0, 7)))
+
+        #sistem timer dan pengurangan nilai dashing
+        #dash kanan
         if self.dashing > 0:
             if self.dashing > 50:
                 self.dashing = max(0, self.dashing - 1)
             else:
                 self.dashing = max(0, self.dashing - 3)
 
+        #dash kiri
         if self.dashing < 0:
             if self.dashing < -50:
                 self.dashing = min(0, self.dashing + 1)
             else:
                 self.dashing = min(0, self.dashing + 3)
 
+        #pengaturan kecepatan fisika & partikel jejak
         if abs(self.dashing) > 50:
             self.velocity[0] = abs(self.dashing) / self.dashing * 8
             if abs(self.dashing) == 51:
