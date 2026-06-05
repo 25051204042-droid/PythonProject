@@ -2,6 +2,7 @@ import json
 
 import pygame
 
+#Berisi aturan bentuk ubin
 AUTOTILE_MAP = {
     tuple(sorted([(1, 0), (0, 1)])): 0,
     tuple(sorted([(1, 0), (0, 1), (-1, 0)])): 1,
@@ -19,6 +20,7 @@ PHYSICS_TILES = {'grass', 'stone'}
 AUTOTILE_TYPES = {'grass', 'stone'}
 
 
+#Sistem Manajemen Peta
 class Tilemap:
     # konstruktor
     def __init__(self, game, tile_size=16):
@@ -27,14 +29,17 @@ class Tilemap:
         self.tilemap = {}
         self.offgrid_tiles = []
 
+    #Mencari dan memisahkan objek khusus (seperti spawner musuh atau pohon) dari peta
     def extract(self, id_pairs, keep=False):
         matches = []
+        #Memeriksa ubin bebas grid
         for tile in self.offgrid_tiles.copy():
             if (tile['type'], tile['variant']) in id_pairs:
                 matches.append(tile.copy())
                 if not keep:
                     self.offgrid_tiles.remove(tile)
 
+        #Memeriksa ubin terikat grid
         for loc in self.tilemap.copy():
             tile = self.tilemap[loc]
             if (tile['type'], tile['variant']) in id_pairs:
@@ -47,6 +52,7 @@ class Tilemap:
 
         return matches
 
+    #Mengambil data ubin apa saja yang berada di sekeliling posisi koordinat tertentu
     def tiles_around(self, pos):
         tiles = []
         tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
@@ -56,11 +62,13 @@ class Tilemap:
                 tiles.append(self.tilemap[check_loc])
         return tiles
 
+    #enyimpan susunan peta yang sudah kamu buat ke dalam file teks json di laptop
     def save(self, path):
         f = open(path, 'w')
         json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_tiles}, f)
         f.close()
 
+    #Membaca berkas json cetak biru peta untuk dirakit menjadi dunia game
     def load(self, path):
         f = open(path, 'r')
         map_data = json.load(f)
@@ -70,12 +78,14 @@ class Tilemap:
         self.tile_size = map_data['tile_size']
         self.offgrid_tiles = map_data['offgrid']
 
+    #untuk mendeteksi apakah suatu titik pixel menabrak ubin padat
     def solid_check(self, pos):
         tile_loc = str(int(pos[0] // self.tile_size)) + ';' + str(int(pos[1] // self.tile_size))
         if tile_loc in self.tilemap:
             if self.tilemap[tile_loc]['type'] in PHYSICS_TILES:
                 return self.tilemap[tile_loc]
 
+    #Mengubah ubin padat di sekitar karakter menjadi kotak tabrakan fisik
     def physics_rects_around(self, pos):
         rects = []
         for tile in self.tiles_around(pos):
@@ -85,6 +95,7 @@ class Tilemap:
                                 self.tile_size))
         return rects
 
+    #untuk merapikan tekstur pinggiran tanah secara otomatis
     def autotile(self):
         for loc in self.tilemap:
             tile = self.tilemap[loc]
@@ -98,6 +109,7 @@ class Tilemap:
             if (tile['type'] in AUTOTILE_TYPES) and (neighbors in AUTOTILE_MAP):
                 tile['variant'] = AUTOTILE_MAP[neighbors]
 
+    #pembatasan layar
     def render(self, surf, offset=(0, 0)):
         for tile in self.offgrid_tiles:
             surf.blit(self.game.assets[tile['type']][tile['variant']],
